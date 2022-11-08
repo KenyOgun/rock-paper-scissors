@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 import { Title } from "./components/Title";
 import { Round } from "./components/Round";
 import { Playground } from "./components/Playground";
@@ -10,7 +12,7 @@ import { Message } from "./components/Message";
 import { Reset } from "./components/Reset";
 
 import { settings } from "./configs/game";
-import React, { useState } from "react";
+
 import rock from "./assets/rock.png";
 import paper from "./assets/paper.png";
 import scissors from "./assets/scissors.png";
@@ -19,7 +21,62 @@ import trophy from "./assets/trophy.png";
 import "./styles.css";
 
 export default function App() {
-  //state object
+  let [game, setGame] = useState({
+    userSelection: "",
+    pcSelection: "",
+    round: 0,
+    userScore: 0,
+    pcScore: 0,
+    message: "",
+  });
+
+  const reset = () => {
+    setGame({
+      ...game,
+      userSelection: "",
+      pcSelection: "",
+      round: 0,
+      userScore: 0,
+      pcScore: 0,
+      message: "",
+    });
+  };
+
+  const { winMessage, tieMessage, lostMessage, winTarget } = settings;
+  const { pcScore, userScore } = game;
+
+  const play = (e) => {
+    if (pcScore < winTarget) {
+      const userSelection = e.target.parentNode.getAttribute("value");
+      const pcSelection = ["Rock", "Paper", "Scissors"][
+        Math.floor(Math.random() * 3)
+      ];
+
+      userSelection === pcSelection
+        ? setGame({
+            ...(game.message = tieMessage),
+          })
+        : (userSelection === "Rock" && pcSelection === "Scissors") ||
+          (userSelection === "Paper" && pcSelection === "Rock") ||
+          (userSelection === "Scissors" && pcSelection === "Paper")
+        ? setGame({
+            ...(game.userScore += 1),
+            ...(game.message = winMessage),
+          })
+        : setGame({
+            ...(game.pcScore += 1),
+            ...(game.message = lostMessage),
+          });
+
+      setGame({
+        ...game,
+        round: (game.round += 1),
+        userSelection,
+        pcSelection,
+      });
+    }
+  };
+
   return (
     <div className="App">
       <Title />
